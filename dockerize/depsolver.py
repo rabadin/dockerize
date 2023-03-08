@@ -92,8 +92,12 @@ class DepSolver(object):
             return
 
         self.deps.add(interp)
+        parent_env = os.environ.copy()
+        ld_lib_path = os.getenv("DOCKERIZE_LD_LIBRARY_PATH")
+        if ld_lib_path is not None:
+            parent_env["LD_LIBRARY_PATH"] = ld_lib_path
         out = subprocess.check_output([interp, '--list', path],
-                                      encoding='utf-8')
+                                      encoding='utf-8', env=parent_env)
 
         for line in out.splitlines():
             for exp in RE_DEPS:
